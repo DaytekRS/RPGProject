@@ -8,5 +8,4 @@ UCLASS()
 class RPGPROJECT_API ARPGPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
 };
