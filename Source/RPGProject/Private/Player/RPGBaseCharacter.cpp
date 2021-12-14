@@ -34,6 +34,7 @@ void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveRight", this, &ARPGBaseCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("LookUp", this, &ARPGBaseCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("TurnAround", this, &ARPGBaseCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ARPGBaseCharacter::Jump);
 }
 
 void ARPGBaseCharacter::MoveForward(const float Axis)
@@ -45,3 +46,4 @@ void ARPGBaseCharacter::MoveRight(const float Axis)
 {
 	AddMovementInput(GetActorRightVector(), Axis);
 }
+
