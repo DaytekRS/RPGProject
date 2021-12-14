@@ -1,9 +1,18 @@
 #include "Player/RPGBaseCharacter.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 ARPGBaseCharacter::ARPGBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
+	SpringArmComponent->SetupAttachment(GetRootComponent());
+	SpringArmComponent->SocketOffset = FVector(0.0f, 0.0f, 80.0f);
+	SpringArmComponent->bUsePawnControlRotation = true;
+
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
+	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
 void ARPGBaseCharacter::BeginPlay()
@@ -14,7 +23,6 @@ void ARPGBaseCharacter::BeginPlay()
 void ARPGBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -33,4 +41,3 @@ void ARPGBaseCharacter::MoveRight(const float Axis)
 {
 	AddMovementInput(GetActorRightVector(), Axis);
 }
-

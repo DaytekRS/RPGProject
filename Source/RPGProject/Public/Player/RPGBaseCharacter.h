@@ -4,6 +4,9 @@
 #include "GameFramework/Character.h"
 #include "RPGBaseCharacter.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
+
 UCLASS()
 class RPGPROJECT_API ARPGBaseCharacter : public ACharacter
 {
@@ -13,8 +16,13 @@ public:
 	ARPGBaseCharacter();
 
 protected:
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	USpringArmComponent* SpringArmComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UCameraComponent* CameraComponent;
 
+	virtual void BeginPlay() override;;
 public:
 	virtual void Tick(float DeltaTime) override;
 
