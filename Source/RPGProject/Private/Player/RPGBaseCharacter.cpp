@@ -18,6 +18,8 @@ ARPGBaseCharacter::ARPGBaseCharacter()
 void ARPGBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	check(SpringArmComponent);
+	check(CameraComponent);
 }
 
 void ARPGBaseCharacter::Tick(float DeltaTime)
@@ -30,6 +32,8 @@ void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward", this, &ARPGBaseCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ARPGBaseCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("LookUp", this, &ARPGBaseCharacter::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("TurnAround", this, &ARPGBaseCharacter::AddControllerYawInput);
 }
 
 void ARPGBaseCharacter::MoveForward(const float Axis)
