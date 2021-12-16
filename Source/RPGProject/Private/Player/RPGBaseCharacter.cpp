@@ -1,6 +1,8 @@
 #include "Player/RPGBaseCharacter.h"
+
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Utils/MathUtil.h"
 
 ARPGBaseCharacter::ARPGBaseCharacter()
 {
@@ -25,6 +27,7 @@ void ARPGBaseCharacter::BeginPlay()
 void ARPGBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	RotateToMovement();
 }
 
 void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -39,11 +42,31 @@ void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ARPGBaseCharacter::MoveForward(const float Axis)
 {
+	MoveVector.X = Axis;
 	AddMovementInput(GetActorForwardVector(), Axis);
 }
 
 void ARPGBaseCharacter::MoveRight(const float Axis)
 {
+	MoveVector.Y = Axis;
 	AddMovementInput(GetActorRightVector(), Axis);
 }
 
+void ARPGBaseCharacter::RotateToMovement()
+{
+	const float DirectionAngle = FUtils::GetAngleDirection(MoveVector);
+
+	if (!FMath::IsNearlyEqual(DirectionAngle, RotateMeshAngle))
+	{
+		const float ClockwiseAngle = FUtils::NormalizeToCircleAngle(DirectionAngle - RotateMeshAngle);
+		const float AnticlockwiseAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle - DirectionAngle);
+		const float SignStepAngle = (ClockwiseAngle < AnticlockwiseAngle) ? 1 : -1;
+		const float AngleToDirection = (ClockwiseAngle < AnticlockwiseAngle) ? ClockwiseAngle : AnticlockwiseAngle;
+
+		float StepAngle = SpeedRotateMesh;
+		if (AngleToDirection < StepAngle) StepAngle = AngleToDirection;
+		RotateMeshAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle + StepAngle * SignStepAngle);
+		FRotator Rotator(0.0f, StepAngle * SignStepAngle, 0.0f);
+		GetMesh()->AddLocalRotation(Rotator);
+	}
+}

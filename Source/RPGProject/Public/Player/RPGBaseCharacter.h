@@ -22,12 +22,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh")
+	float SpeedRotateMesh = 4.0f;
+
 	virtual void BeginPlay() override;;
 public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
+	FVector MoveVector = {0.0f,0.0f,0.0f};
+    float RotateMeshAngle = 0.0f;
+	
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
+	void RotateToMovement();
 };
