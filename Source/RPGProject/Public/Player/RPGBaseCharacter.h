@@ -18,12 +18,12 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USpringArmComponent* SpringArmComponent;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* CameraComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh")
-	float SpeedRotateMesh = 4.0f;
+	float SpeedRotateMesh = 3.0f;
 
 	virtual void BeginPlay() override;;
 public:
@@ -31,9 +31,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
-	FVector MoveVector = {0.0f,0.0f,0.0f};
-    float RotateMeshAngle = 0.0f;
-	
+	FVector MoveVector = {0.0f, 0.0f, 0.0f};
+
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
 	void RotateToMovement();

@@ -7,6 +7,7 @@
 ARPGBaseCharacter::ARPGBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bUseControllerRotationYaw = false;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
@@ -43,18 +44,24 @@ void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void ARPGBaseCharacter::MoveForward(const float Axis)
 {
 	MoveVector.X = Axis;
-	AddMovementInput(GetActorForwardVector(), Axis);
+	AddMovementInput(CameraComponent->GetForwardVector(), Axis);
 }
 
 void ARPGBaseCharacter::MoveRight(const float Axis)
 {
 	MoveVector.Y = Axis;
-	AddMovementInput(GetActorRightVector(), Axis);
+	AddMovementInput(CameraComponent->GetRightVector(), Axis);
 }
 
 void ARPGBaseCharacter::RotateToMovement()
 {
 	const float DirectionAngle = FUtils::GetAngleDirection(MoveVector);
+	if (FMath::IsNearlyEqual(DirectionAngle, -1.0f)) return;
+
+	FVector CameraVector(CameraComponent->GetForwardVector().X, CameraComponent->GetForwardVector().Y, 0.0f);
+	CameraVector.Normalize();
+	float RotateMeshAngle = FUtils::DegreesBetweenVectors(CameraVector, GetMesh()->GetRightVector());
+	RotateMeshAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle);
 
 	if (!FMath::IsNearlyEqual(DirectionAngle, RotateMeshAngle))
 	{
@@ -65,8 +72,7 @@ void ARPGBaseCharacter::RotateToMovement()
 
 		float StepAngle = SpeedRotateMesh;
 		if (AngleToDirection < StepAngle) StepAngle = AngleToDirection;
-		RotateMeshAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle + StepAngle * SignStepAngle);
-		FRotator Rotator(0.0f, StepAngle * SignStepAngle, 0.0f);
+		const FRotator Rotator(0.0f, StepAngle * SignStepAngle, 0.0f);
 		GetMesh()->AddLocalRotation(Rotator);
 	}
 }
