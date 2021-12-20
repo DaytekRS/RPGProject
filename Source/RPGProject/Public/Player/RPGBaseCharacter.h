@@ -13,7 +13,7 @@ class RPGPROJECT_API ARPGBaseCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	ARPGBaseCharacter();
+	ARPGBaseCharacter(const FObjectInitializer& ObjInit);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -36,4 +36,6 @@ private:
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
 	void RotateToMovement();
+	void StartRun();
+	void StopRun();
 };

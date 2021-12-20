@@ -1,10 +1,12 @@
 #include "Player/RPGBaseCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/RPGCharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Utils/MathUtil.h"
 
-ARPGBaseCharacter::ARPGBaseCharacter()
+ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
+	ObjInit.SetDefaultSubobjectClass<URPGCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = false;
@@ -39,6 +41,8 @@ void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("LookUp", this, &ARPGBaseCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("TurnAround", this, &ARPGBaseCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ARPGBaseCharacter::Jump);
+	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &ARPGBaseCharacter::StartRun);
+	PlayerInputComponent->BindAction("Run", IE_Released, this, &ARPGBaseCharacter::StopRun);
 }
 
 void ARPGBaseCharacter::MoveForward(const float Axis)
@@ -75,4 +79,14 @@ void ARPGBaseCharacter::RotateToMovement()
 		const FRotator Rotator(0.0f, StepAngle * SignStepAngle, 0.0f);
 		GetMesh()->AddLocalRotation(Rotator);
 	}
+}
+
+void ARPGBaseCharacter::StartRun()
+{
+	Cast<URPGCharacterMovementComponent>(GetMovementComponent())->TurnOnWalkModifier();
+}
+
+void ARPGBaseCharacter::StopRun()
+{
+	Cast<URPGCharacterMovementComponent>(GetMovementComponent())->TurnOffWalkModifier();
 }
