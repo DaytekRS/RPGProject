@@ -1,9 +1,11 @@
 #include "Player/RPGBaseCharacter.h"
 
+#include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/RPGCharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Utils/MathUtil.h"
+#include "Components/RPGHealthComponent.h"
 
 ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
 	ObjInit.SetDefaultSubobjectClass<URPGCharacterMovementComponent>(CharacterMovementComponentName))
@@ -18,6 +20,8 @@ ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	HeathComponent = CreateDefaultSubobject<URPGHealthComponent>("HeathComponent");
 }
 
 void ARPGBaseCharacter::BeginPlay()
@@ -25,6 +29,7 @@ void ARPGBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 	check(SpringArmComponent);
 	check(CameraComponent);
+	LandedDelegate.AddDynamic(this, &ARPGBaseCharacter::OnGroundLanded);
 }
 
 void ARPGBaseCharacter::Tick(float DeltaTime)
@@ -89,4 +94,14 @@ void ARPGBaseCharacter::StartRun()
 void ARPGBaseCharacter::StopRun()
 {
 	Cast<URPGCharacterMovementComponent>(GetMovementComponent())->TurnOffWalkModifier();
+}
+
+void ARPGBaseCharacter::OnGroundLanded(const FHitResult& Hit)
+{
+	const auto FallVelocityZ = -GetCharacterMovement()->Velocity.Z;
+	if (FallVelocityZ < LandedDamageVelocity.X) return;
+	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
+	UE_LOG(LogTemp, Display, TEXT("Player Take Damage Groud Landed:  %f"), FinalDamage);
+	GEngine->AddOnScreenDebugMessage(-1,2.0f,FColor::Red,*("Damege "+FString::SanitizeFloat(FinalDamage)));
+	TakeDamage(FinalDamage, FDamageEvent{}, nullptr , nullptr);
 }
