@@ -37,6 +37,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
 	FVector2D LandedDamage{10.0f, 100.0f};
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animations")
+	UAnimMontage* DeathAnimMontage;
+
 	virtual void BeginPlay() override;;
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -53,4 +56,6 @@ private:
 
 	UFUNCTION()
 	void OnGroundLanded(const FHitResult& Hit);
+	void OnDeath();
+	
 };

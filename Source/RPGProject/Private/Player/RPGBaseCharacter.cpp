@@ -22,6 +22,7 @@ ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
 	HeathComponent = CreateDefaultSubobject<URPGHealthComponent>("HeathComponent");
+	HeathComponent->OnDeath.AddUObject(this, &ARPGBaseCharacter::OnDeath);
 }
 
 void ARPGBaseCharacter::BeginPlay()
@@ -103,4 +104,15 @@ void ARPGBaseCharacter::OnGroundLanded(const FHitResult& Hit)
 	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
 	UE_LOG(LogBaseCharacter, Display, TEXT("Player Take Damage Groud Landed:  %f"), FinalDamage);
 	TakeDamage(FinalDamage, FDamageEvent{}, nullptr , nullptr);
+}
+
+void ARPGBaseCharacter::OnDeath()
+{
+	GetCharacterMovement()->DisableMovement();
+	PlayAnimMontage(DeathAnimMontage);
+	SetLifeSpan(5.0f);
+	if (Controller)
+	{
+		Controller->ChangeState(NAME_Spectating);
+	}
 }

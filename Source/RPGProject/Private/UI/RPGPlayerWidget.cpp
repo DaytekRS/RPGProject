@@ -8,7 +8,7 @@
 float URPGPlayerWidget::GetHealthProcent() const
 {
 	auto HealthComponent = GetComponent<URPGHealthComponent>();
-	return HealthComponent->GetHealthProcent();
+	return HealthComponent ? HealthComponent->GetHealthProcent() : 0.0f;
 }
 
 template <typename T>
