@@ -32,12 +32,12 @@ void URPGHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, co
                                           AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (Damage <= 0 || !GetWorld() || IsDead()) return;
-	if (OnAutoHeal)
+	SetHealth(CurrentHealth - Damage);
+	GetWorld()->GetTimerManager().ClearTimer(AutoHealTimer);
+	if (OnAutoHeal && !IsDead())
 	{
-		GetWorld()->GetTimerManager().ClearTimer(AutoHealTimer);
 		GetWorld()->GetTimerManager().SetTimer(AutoHealTimer, this, &URPGHealthComponent::AutoHealthActor, AutoHealRate, true, FirstHealDelay);
 	}
-	SetHealth(CurrentHealth - Damage);
 }
 
 void URPGHealthComponent::AutoHealthActor()
