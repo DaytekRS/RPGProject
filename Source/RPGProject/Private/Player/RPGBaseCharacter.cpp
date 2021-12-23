@@ -101,7 +101,6 @@ void ARPGBaseCharacter::OnGroundLanded(const FHitResult& Hit)
 	const auto FallVelocityZ = -GetCharacterMovement()->Velocity.Z;
 	if (FallVelocityZ < LandedDamageVelocity.X) return;
 	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
-	UE_LOG(LogTemp, Display, TEXT("Player Take Damage Groud Landed:  %f"), FinalDamage);
-	GEngine->AddOnScreenDebugMessage(-1,2.0f,FColor::Red,*("Damege "+FString::SanitizeFloat(FinalDamage)));
+	UE_LOG(LogBaseCharacter, Display, TEXT("Player Take Damage Groud Landed:  %f"), FinalDamage);
 	TakeDamage(FinalDamage, FDamageEvent{}, nullptr , nullptr);
 }
