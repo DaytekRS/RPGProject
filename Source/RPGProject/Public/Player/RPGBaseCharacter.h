@@ -9,6 +9,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 class UCameraComponent;
 class USpringArmComponent;
 class URPGHealthComponent;
+class URPGWeaponComponent;
 
 UCLASS()
 class RPGPROJECT_API ARPGBaseCharacter : public ACharacter
@@ -27,6 +28,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	URPGHealthComponent* HeathComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	URPGWeaponComponent* WeaponComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh")
 	float SpeedRotateMesh = 3.0f;

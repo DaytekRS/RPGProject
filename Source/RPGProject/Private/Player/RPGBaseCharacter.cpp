@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Utils/MathUtil.h"
 #include "Components/RPGHealthComponent.h"
+#include "Components/RPGWeaponComponent.h"
 
 ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
 	ObjInit.SetDefaultSubobjectClass<URPGCharacterMovementComponent>(CharacterMovementComponentName))
@@ -23,13 +24,19 @@ ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
 
 	HeathComponent = CreateDefaultSubobject<URPGHealthComponent>("HeathComponent");
 	HeathComponent->OnDeath.AddUObject(this, &ARPGBaseCharacter::OnDeath);
+
+	WeaponComponent = CreateDefaultSubobject<URPGWeaponComponent>("WeaponComponent");
 }
 
 void ARPGBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	check(SpringArmComponent);
 	check(CameraComponent);
+	check(HeathComponent);
+	check(WeaponComponent);
+	
 	LandedDelegate.AddDynamic(this, &ARPGBaseCharacter::OnGroundLanded);
 }
 
