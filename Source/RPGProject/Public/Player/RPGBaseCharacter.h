@@ -26,7 +26,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	bool GetInteractiveData(FInteractiveData& InteractiveData);
-	
+
 	void EquipWeapon(ARPGBaseWeapon* Weapon) const;
 
 protected:
@@ -42,11 +42,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	URPGWeaponComponent* WeaponComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interactive")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interactive")
+	bool NeedSearchInteractive = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interactive",
+		meta=(EditCondition = "NeedSearchInteractive"))
 	float DistanceSearch = 500.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh")
-	float SpeedRotateMesh = 3.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interactive",
+		meta=(EditCondition = "NeedSearchInteractive", ClampMin="0.01"))
+	float SearchInteractiveRate = 0.3f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotate Mesh")
+	bool NeedRotateMesh = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh",
+		meta=(EditCondition = "NeedRotateMesh", ClampMin="0.01"))
+	float StepAngleRotateMesh = 5.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh",
+		meta=(EditCondition = "NeedRotateMesh", ClampMin="0.01"))
+	float RateRotateMesh = 0.015f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
 	FVector2D LandedDamageVelocity{600.0f, 1200.0f};
@@ -58,11 +74,12 @@ protected:
 	UAnimMontage* DeathAnimMontage;
 
 	virtual void BeginPlay() override;;
-	
+
 private:
 	FVector MoveVector = {0.0f, 0.0f, 0.0f};
 	IInteractiveInterface* FoundInteractiveObject = nullptr;
-	const float RotateDelta = 3.0f;
+	FTimerHandle SearchInteractiveTimer, RotateTimer;
+	const float RotateDelta = 1.5f;
 
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);

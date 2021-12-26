@@ -44,13 +44,13 @@ void ARPGBaseCharacter::BeginPlay()
 	check(WeaponComponent);
 
 	LandedDelegate.AddDynamic(this, &ARPGBaseCharacter::OnGroundLanded);
+	if (NeedSearchInteractive) GetWorld()->GetTimerManager().SetTimer(SearchInteractiveTimer, this, &ARPGBaseCharacter::SearchInteractive, SearchInteractiveRate, true);
+	if (NeedRotateMesh) GetWorld()->GetTimerManager().SetTimer(RotateTimer, this, &ARPGBaseCharacter::RotateToMovement, RateRotateMesh, true);
 }
 
 void ARPGBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	RotateToMovement();
-	SearchInteractive();
 }
 
 void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -89,21 +89,29 @@ void ARPGBaseCharacter::MoveRight(const float Axis)
 void ARPGBaseCharacter::RotateToMovement()
 {
 	if (GetMovementComponent()->IsFalling()) return;
-	const float DirectionAngle = FUtils::GetAngleDirection(MoveVector);
-	if (FMath::IsNearlyEqual(DirectionAngle, -1.0f)) return;
-	
+
+	//DirectionAngle - Angle between Move Vector and Forward Vector camera
+	float DirectionAngle;
+	if (!FUtils::GetAngleDirection(MoveVector, DirectionAngle)) return;
+
 	FVector CameraVector = CameraComponent->GetForwardVector().GetSafeNormal2D();
+	//RotateMeshAngle - Angle between Mesh Forward Vector and Forward Vector camera
 	float RotateMeshAngle = FUtils::DegreesBetweenVectors(CameraVector, GetMesh()->GetRightVector());
 	RotateMeshAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle);
-	
+
+	//Checking for sufficient turn Mesh
+	//if the mesh does not fall within the rotation gap, rotate it
 	if (!(RotateMeshAngle > DirectionAngle - RotateDelta && RotateMeshAngle < DirectionAngle + RotateDelta))
 	{
+		//ClockwiseAngle - Angle Clockwise to Direction vector
 		const float ClockwiseAngle = FUtils::NormalizeToCircleAngle(DirectionAngle - RotateMeshAngle);
+		//ClockwiseAngle - Angle nticlockwise to Direction vector
 		const float AnticlockwiseAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle - DirectionAngle);
 		const float SignStepAngle = (ClockwiseAngle < AnticlockwiseAngle) ? 1 : -1;
+		//AngleToDirection - the angle of the mildest turn up to Direction vector
 		const float AngleToDirection = (ClockwiseAngle < AnticlockwiseAngle) ? ClockwiseAngle : AnticlockwiseAngle;
-
-		float StepAngle = SpeedRotateMesh;
+		//StepAngle - the angle how much the character will be rotated at the current step
+		float StepAngle = StepAngleRotateMesh;
 		if (AngleToDirection < StepAngle) StepAngle = AngleToDirection;
 		const FRotator Rotator(0.0f, StepAngle * SignStepAngle, 0.0f);
 		GetMesh()->AddLocalRotation(Rotator);
@@ -134,6 +142,8 @@ void ARPGBaseCharacter::OnDeath()
 	GetCharacterMovement()->DisableMovement();
 	PlayAnimMontage(DeathAnimMontage);
 	SetLifeSpan(5.0f);
+	if (NeedSearchInteractive) GetWorld()->GetTimerManager().ClearTimer(SearchInteractiveTimer);
+	if (NeedRotateMesh) GetWorld()->GetTimerManager().ClearTimer(RotateTimer);
 	if (Controller)
 	{
 		Controller->ChangeState(NAME_Spectating);
@@ -147,7 +157,7 @@ void ARPGBaseCharacter::SearchInteractive()
 	FVector LineStart = CameraComponent->GetComponentLocation();
 	FVector ForwardVector = CameraComponent->GetForwardVector();
 	FVector LineEnd = LineStart + ForwardVector * DistanceSearch;
-	
+
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());
