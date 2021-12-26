@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InteractiveInterface.h"
+#include "RPGBaseWeapon.h"
 #include "GameFramework/Character.h"
 #include "RPGBaseCharacter.generated.h"
 
@@ -19,6 +21,8 @@ class RPGPROJECT_API ARPGBaseCharacter : public ACharacter
 public:
 	ARPGBaseCharacter(const FObjectInitializer& ObjInit);
 
+	void EquipWeapon(ARPGBaseWeapon* Weapon) const;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USpringArmComponent* SpringArmComponent;
@@ -32,6 +36,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	URPGWeaponComponent* WeaponComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interactive")
+	float DistanceSearch = 500.0f;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh")
 	float SpeedRotateMesh = 3.0f;
 
@@ -43,7 +50,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animations")
 	UAnimMontage* DeathAnimMontage;
-
+	
 	virtual void BeginPlay() override;;
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -51,7 +58,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
 	FVector MoveVector = {0.0f, 0.0f, 0.0f};
-
+	IInteractiveInterface* FoundInteractiveObject = nullptr;
+	
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
 	void RotateToMovement();
@@ -61,5 +69,7 @@ private:
 	UFUNCTION()
 	void OnGroundLanded(const FHitResult& Hit);
 	void OnDeath();
-	
+
+	void SearchInteractive();
+	void StartInteractive();
 };

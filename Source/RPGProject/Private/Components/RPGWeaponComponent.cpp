@@ -3,6 +3,7 @@
 
 #include "Components/RPGWeaponComponent.h"
 
+#include "InteractiveInterface.h"
 #include "GameFramework/Character.h"
 
 URPGWeaponComponent::URPGWeaponComponent()
@@ -15,20 +16,23 @@ URPGWeaponComponent::URPGWeaponComponent()
 void URPGWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SpawnStandartWeapon();
+	if (NeedSpawnStandartWeapon){
+		SpawnStandartWeapon();
+	}
 }
 
-void URPGWeaponComponent::EquipWeapon(ARPGBaseWeapon*)
+void URPGWeaponComponent::EquipWeapon(ARPGBaseWeapon* Weapon)
 {
-	
+	ACharacter* Player = Cast<ACharacter>(GetOwner());
+	if (!Player) return;
+	DetachWeapon(CurrentWeapon);
+	AttachWeaponToSocket(Weapon, Player->GetMesh(), *WeaponSocketName);
 }
 
 void URPGWeaponComponent::SpawnStandartWeapon()
 {
-	ACharacter* Player = Cast<ACharacter>(GetOwner());
-	if (!Player || !GetWorld()) return;
-	CurrentWeapon = GetWorld()->SpawnActor<ARPGBaseWeapon>(WeaponStandartClass);
-	AttachWeaponToSocket(CurrentWeapon, Player->GetMesh(), *WeaponSocketName);
+	if (!GetWorld()) return;
+	EquipWeapon(GetWorld()->SpawnActor<ARPGBaseWeapon>(WeaponStandartClass));
 }
 
 void URPGWeaponComponent::AttachWeaponToSocket(ARPGBaseWeapon* Weapon, USceneComponent* SceneComponent,
@@ -37,6 +41,17 @@ void URPGWeaponComponent::AttachWeaponToSocket(ARPGBaseWeapon* Weapon, USceneCom
 	if (!Weapon || !SceneComponent) return;
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 	Weapon->AttachToComponent(SceneComponent, AttachmentRules, SocketName);
+	CurrentWeapon = Weapon;
+}
+
+void URPGWeaponComponent::DetachWeapon(ARPGBaseWeapon* Weapon, EDetachmentRule InRule)
+{
+	if (!Weapon) return;
+	const FDetachmentTransformRules DetachmentRules(InRule, false);
+	Weapon->DetachFromActor(DetachmentRules);
+	const auto InteractiveComponent = Cast<IInteractiveInterface>(Weapon);
+	if (InteractiveComponent) InteractiveComponent->InteractiveStop(GetOwner());
+	CurrentWeapon = nullptr;
 }
 
 

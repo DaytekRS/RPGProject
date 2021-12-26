@@ -7,15 +7,19 @@ public class RPGProject : ModuleRules
 	public RPGProject(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PublicDependencyModuleNames.AddRange(new string[] {"Core", "CoreUObject", "Engine", "InputCore"});
 
-		PublicIncludePaths.AddRange(new string[] { "RPGProject/Public/Utils", "RPGProject/Public/Player"});
+		PrivateDependencyModuleNames.AddRange(new string[] { });
+
+		PublicIncludePaths.AddRange(new string[]
+		{
+			"RPGProject/Public/Utils", "RPGProject/Public/Player", "RPGProject/Public/Components",
+			"RPGProject/Public/Interfaces", "RPGProject/Public/Weapons"
+		});
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
+
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 

@@ -2,7 +2,10 @@
 
 
 #include "Weapons/RPGBaseWeapon.h"
+
+#include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/SceneComponent.h"
 
 ARPGBaseWeapon::ARPGBaseWeapon()
 {

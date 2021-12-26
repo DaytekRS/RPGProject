@@ -1,6 +1,7 @@
 #include "Player/RPGBaseCharacter.h"
 
 #include "DrawDebugHelpers.h"
+#include "InteractiveInterface.h"
 #include "Camera/CameraComponent.h"
 #include "Components/RPGCharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -28,15 +29,20 @@ ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
 	WeaponComponent = CreateDefaultSubobject<URPGWeaponComponent>("WeaponComponent");
 }
 
+void ARPGBaseCharacter::EquipWeapon(ARPGBaseWeapon* Weapon) const
+{
+	WeaponComponent->EquipWeapon(Cast<ARPGBaseWeapon>(FoundInteractiveObject));
+}
+
 void ARPGBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	check(SpringArmComponent);
 	check(CameraComponent);
 	check(HeathComponent);
 	check(WeaponComponent);
-	
+
 	LandedDelegate.AddDynamic(this, &ARPGBaseCharacter::OnGroundLanded);
 }
 
@@ -44,6 +50,7 @@ void ARPGBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	RotateToMovement();
+	SearchInteractive();
 }
 
 void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -56,6 +63,7 @@ void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ARPGBaseCharacter::Jump);
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &ARPGBaseCharacter::StartRun);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ARPGBaseCharacter::StopRun);
+	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ARPGBaseCharacter::StartInteractive);
 }
 
 void ARPGBaseCharacter::MoveForward(const float Axis)
@@ -110,7 +118,7 @@ void ARPGBaseCharacter::OnGroundLanded(const FHitResult& Hit)
 	if (FallVelocityZ < LandedDamageVelocity.X) return;
 	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
 	UE_LOG(LogBaseCharacter, Display, TEXT("Player Take Damage Groud Landed:  %f"), FinalDamage);
-	TakeDamage(FinalDamage, FDamageEvent{}, nullptr , nullptr);
+	TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }
 
 void ARPGBaseCharacter::OnDeath()
@@ -122,4 +130,31 @@ void ARPGBaseCharacter::OnDeath()
 	{
 		Controller->ChangeState(NAME_Spectating);
 	}
+}
+
+void ARPGBaseCharacter::SearchInteractive()
+{
+	FVector LineStart = CameraComponent->GetComponentLocation();
+	FVector ForwardVector = CameraComponent->GetForwardVector();
+	FVector LineEnd = LineStart + ForwardVector * DistanceSearch;
+
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(GetOwner());
+	GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECollisionChannel::ECC_Visibility,
+	                                     CollisionParams);
+	FoundInteractiveObject = nullptr;
+	if (HitResult.bBlockingHit)
+	{
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 5.0f, 24, FColor::Red, false, -1, 0, 3.0f);
+		auto InteractiveComponent = Cast<IInteractiveInterface>(HitResult.GetActor());
+		if (!InteractiveComponent || !InteractiveComponent->IsCanInteractive(this)) return;
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 6.0f, 24, FColor::Green, false, -1, 0, 3.0f);
+		FoundInteractiveObject = InteractiveComponent;
+	}
+}
+
+void ARPGBaseCharacter::StartInteractive()
+{
+	if (FoundInteractiveObject) FoundInteractiveObject->InteractiveStart(this);
 }

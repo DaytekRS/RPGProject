@@ -15,9 +15,14 @@ class RPGPROJECT_API URPGWeaponComponent : public UActorComponent
 
 public:
 	URPGWeaponComponent();
-
+	
+	void EquipWeapon(ARPGBaseWeapon* Weapon);
+	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Standart Weapon")
+	bool NeedSpawnStandartWeapon = false;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Standart Weapon", meta=(EditCondition = "NeedSpawnStandartWeapon"))
 	TSubclassOf<ARPGBaseWeapon> WeaponStandartClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
@@ -27,8 +32,11 @@ protected:
 
 private:
 	ARPGBaseWeapon* CurrentWeapon;
-
-	void EquipWeapon(ARPGBaseWeapon*);
+	
 	void SpawnStandartWeapon();
 	void AttachWeaponToSocket(ARPGBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
+	void DetachWeapon(ARPGBaseWeapon* Weapon, EDetachmentRule InRule = EDetachmentRule::KeepWorld);
 };
+
+
+
