@@ -80,6 +80,7 @@ void ARPGBaseCharacter::MoveRight(const float Axis)
 
 void ARPGBaseCharacter::RotateToMovement()
 {
+	if (GetMovementComponent()->IsFalling()) return;
 	const float DirectionAngle = FUtils::GetAngleDirection(MoveVector);
 	if (FMath::IsNearlyEqual(DirectionAngle, -1.0f)) return;
 
@@ -134,6 +135,8 @@ void ARPGBaseCharacter::OnDeath()
 
 void ARPGBaseCharacter::SearchInteractive()
 {
+	FoundInteractiveObject = nullptr;
+	if (GetMovementComponent()->IsFalling()) return;
 	FVector LineStart = CameraComponent->GetComponentLocation();
 	FVector ForwardVector = CameraComponent->GetForwardVector();
 	FVector LineEnd = LineStart + ForwardVector * DistanceSearch;
@@ -143,7 +146,6 @@ void ARPGBaseCharacter::SearchInteractive()
 	CollisionParams.AddIgnoredActor(GetOwner());
 	GetWorld()->LineTraceSingleByChannel(HitResult, LineStart, LineEnd, ECollisionChannel::ECC_Visibility,
 	                                     CollisionParams);
-	FoundInteractiveObject = nullptr;
 	if (HitResult.bBlockingHit)
 	{
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 5.0f, 24, FColor::Red, false, -1, 0, 3.0f);
