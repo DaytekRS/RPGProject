@@ -75,8 +75,9 @@ bool ARPGBaseCharacter::GetInteractiveData(FInteractiveData& InteractiveData)
 
 void ARPGBaseCharacter::MoveForward(const float Axis)
 {
+	FVector CameraVector = CameraComponent->GetForwardVector().GetSafeNormal2D();
 	MoveVector.X = Axis;
-	AddMovementInput(CameraComponent->GetForwardVector(), Axis);
+	AddMovementInput(CameraVector, Axis);
 }
 
 void ARPGBaseCharacter::MoveRight(const float Axis)
@@ -90,13 +91,12 @@ void ARPGBaseCharacter::RotateToMovement()
 	if (GetMovementComponent()->IsFalling()) return;
 	const float DirectionAngle = FUtils::GetAngleDirection(MoveVector);
 	if (FMath::IsNearlyEqual(DirectionAngle, -1.0f)) return;
-
-	FVector CameraVector(CameraComponent->GetForwardVector().X, CameraComponent->GetForwardVector().Y, 0.0f);
-	CameraVector.Normalize();
+	
+	FVector CameraVector = CameraComponent->GetForwardVector().GetSafeNormal2D();
 	float RotateMeshAngle = FUtils::DegreesBetweenVectors(CameraVector, GetMesh()->GetRightVector());
 	RotateMeshAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle);
-
-	if (!FMath::IsNearlyEqual(DirectionAngle, RotateMeshAngle))
+	
+	if (!(RotateMeshAngle > DirectionAngle - RotateDelta && RotateMeshAngle < DirectionAngle + RotateDelta))
 	{
 		const float ClockwiseAngle = FUtils::NormalizeToCircleAngle(DirectionAngle - RotateMeshAngle);
 		const float AnticlockwiseAngle = FUtils::NormalizeToCircleAngle(RotateMeshAngle - DirectionAngle);
@@ -147,7 +147,7 @@ void ARPGBaseCharacter::SearchInteractive()
 	FVector LineStart = CameraComponent->GetComponentLocation();
 	FVector ForwardVector = CameraComponent->GetForwardVector();
 	FVector LineEnd = LineStart + ForwardVector * DistanceSearch;
-
+	
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());

@@ -62,6 +62,7 @@ protected:
 private:
 	FVector MoveVector = {0.0f, 0.0f, 0.0f};
 	IInteractiveInterface* FoundInteractiveObject = nullptr;
+	const float RotateDelta = 3.0f;
 
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
