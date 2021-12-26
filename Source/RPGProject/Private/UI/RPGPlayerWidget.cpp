@@ -3,12 +3,20 @@
 
 #include "UI/RPGPlayerWidget.h"
 
+#include "RPGBaseCharacter.h"
 #include "Components/RPGHealthComponent.h"
 
 float URPGPlayerWidget::GetHealthProcent() const
 {
-	auto HealthComponent = GetComponent<URPGHealthComponent>();
+	const auto HealthComponent = GetComponent<URPGHealthComponent>();
 	return HealthComponent ? HealthComponent->GetHealthProcent() : 0.0f;
+}
+
+ bool URPGPlayerWidget::GetInteractiveDate(FInteractiveData& InteractiveData) const
+{
+	const auto Character = Cast<ARPGBaseCharacter>(GetOwningPlayerPawn());
+	if (!Character) return  false;
+	return Character->GetInteractiveData(InteractiveData);
 }
 
 template <typename T>

@@ -8,9 +8,8 @@
 
 ARPGBlackKnightWeapon::ARPGBlackKnightWeapon()
 {
-	InteractiveData.Message = "Подобрать предмет";
+	InteractiveData.ActionMessage = TEXT("Подобрать предмет");
 	InteractiveData.DisplayUseKeyMessage = true;
-	InteractiveData.Type = PickUpItem;
 }
 
 

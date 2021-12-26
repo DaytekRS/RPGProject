@@ -21,8 +21,14 @@ class RPGPROJECT_API ARPGBaseCharacter : public ACharacter
 public:
 	ARPGBaseCharacter(const FObjectInitializer& ObjInit);
 
-	void EquipWeapon(ARPGBaseWeapon* Weapon) const;
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	bool GetInteractiveData(FInteractiveData& InteractiveData);
 	
+	void EquipWeapon(ARPGBaseWeapon* Weapon) const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USpringArmComponent* SpringArmComponent;
@@ -38,7 +44,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Interactive")
 	float DistanceSearch = 500.0f;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Rotate Mesh")
 	float SpeedRotateMesh = 3.0f;
 
@@ -50,16 +56,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animations")
 	UAnimMontage* DeathAnimMontage;
-	
-	virtual void BeginPlay() override;;
-public:
-	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void BeginPlay() override;;
+	
 private:
 	FVector MoveVector = {0.0f, 0.0f, 0.0f};
 	IInteractiveInterface* FoundInteractiveObject = nullptr;
-	
+
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
 	void RotateToMovement();

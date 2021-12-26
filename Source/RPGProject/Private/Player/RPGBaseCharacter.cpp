@@ -66,6 +66,13 @@ void ARPGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ARPGBaseCharacter::StartInteractive);
 }
 
+bool ARPGBaseCharacter::GetInteractiveData(FInteractiveData& InteractiveData)
+{
+	if (!FoundInteractiveObject) return false;
+	InteractiveData = FoundInteractiveObject->GetInteractiveData();
+	return true;
+}
+
 void ARPGBaseCharacter::MoveForward(const float Axis)
 {
 	MoveVector.X = Axis;

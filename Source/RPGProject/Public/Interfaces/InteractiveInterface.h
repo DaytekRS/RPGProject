@@ -3,20 +3,22 @@
 #include "CoreMinimal.h"
 #include "InteractiveInterface.generated.h"
 
-UENUM(BlueprintType)
-enum ETypeInteractive
-{
-	PickUpItem
-};
-
 USTRUCT(BlueprintType)
 struct FInteractiveData
 {
 	GENERATED_USTRUCT_BODY()
 
-	FString Message;
+	UPROPERTY(BlueprintReadOnly)
+	FString ActionMessage;
+	
+	UPROPERTY(BlueprintReadOnly)
 	bool DisplayUseKeyMessage;
-	ETypeInteractive Type;
+
+	FInteractiveData()
+	{
+		ActionMessage = "Empty message";
+		DisplayUseKeyMessage = true;
+	}
 };
 
 UINTERFACE(BlueprintType)
@@ -43,5 +45,5 @@ public:
 	virtual void InteractiveStop(AActor* Actor) = 0;
 
 protected:
-	FInteractiveData InteractiveData{"Empty message", true, PickUpItem};
+	FInteractiveData InteractiveData;
 };

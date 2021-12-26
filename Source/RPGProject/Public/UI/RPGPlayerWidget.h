@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InteractiveInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "RPGPlayerWidget.generated.h"
 
@@ -14,6 +15,9 @@ class RPGPROJECT_API URPGPlayerWidget : public UUserWidget
 public:
 	UFUNCTION(BlueprintCallable, Category="UI")
 	float GetHealthProcent() const;
+
+	UFUNCTION(BlueprintCallable, Category="UI")
+	bool GetInteractiveDate(FInteractiveData& InteractiveData) const;
 	
 private:
 	template <typename T>

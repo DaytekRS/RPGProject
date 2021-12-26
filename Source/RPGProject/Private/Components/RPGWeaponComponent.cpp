@@ -9,7 +9,6 @@
 URPGWeaponComponent::URPGWeaponComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	SpawnStandartWeapon();
 }
 
 
