@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class URPGHealthComponent;
 class URPGWeaponComponent;
+class UChildActorComponent;
 
 UCLASS()
 class RPGPROJECT_API ARPGBaseCharacter : public ACharacter
@@ -32,6 +33,12 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USpringArmComponent* SpringArmComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	USpringArmComponent* SpringArmMinimapComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UChildActorComponent*  MapCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* CameraComponent;

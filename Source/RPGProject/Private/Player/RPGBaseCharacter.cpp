@@ -20,6 +20,18 @@ ARPGBaseCharacter::ARPGBaseCharacter(const FObjectInitializer& ObjInit) : Super(
 	SpringArmComponent->SocketOffset = FVector(0.0f, 0.0f, 80.0f);
 	SpringArmComponent->bUsePawnControlRotation = true;
 
+	SpringArmMinimapComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmMinimapComponent");
+	SpringArmMinimapComponent->SetupAttachment(GetRootComponent());
+	SpringArmMinimapComponent->AddLocalRotation(FRotator(-90.0f, 0.0f, 0.0f));
+	SpringArmMinimapComponent->TargetArmLength = 650.0f;
+	SpringArmMinimapComponent->bDoCollisionTest = false;
+	SpringArmMinimapComponent->bInheritYaw = false;
+	SpringArmMinimapComponent->bInheritPitch = false;
+	SpringArmMinimapComponent->bInheritRoll = false;
+
+	MapCamera = CreateDefaultSubobject<UChildActorComponent>("MapCamera");
+	MapCamera->SetupAttachment(SpringArmMinimapComponent);
+
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
